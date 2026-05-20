@@ -4,10 +4,10 @@ import time
 # 1. 페이지 기본 설정
 st.set_page_config(page_title="나의 오운완 기록지", layout="centered")
 
-# 디자인을 위한 CSS 주입 (옵션명을 unsafe_allow_html=True 로 정확히 수정했습니다)
+# 디자인을 위한 CSS 주입
 st.markdown("""
     <style>
-    /* 전체 배경과 카드 스타일 */
+    /* 전체 배경 스타일 */
     .stApp { background-color: #0f172a; color: #f8fafc; }
     
     /* 타이머 글씨 강조 */
@@ -26,7 +26,7 @@ st.markdown("""
 
 st.title("🏋️‍♂️ 나의 오운완 기록지")
 
-# 2. 데이터 세션 상태 초기화 (새로고침해도 데이터가 유지되도록)
+# 2. 데이터 세션 상태 초기화
 if 'sets' not in st.session_state:
     st.session_state.sets = [
         {"set": 1, "weight": 60, "reps": 10, "completed": False},
@@ -41,14 +41,13 @@ if 'timer_seconds' not in st.session_state:
 # 3. [기능] 타이머 작동 로직
 if st.session_state.timer_start and st.session_state.timer_seconds > 0:
     timer_placeholder = st.empty()
-    # 대기 시간을 실시간으로 줄여가며 표시
     for idx in range(st.session_state.timer_seconds, -1, -1):
         if idx > 0:
             timer_placeholder.markdown(f"<div class='timer-text'>⏱ 휴식 중... {idx}초 남음</div>", unsafe_allow_html=True)
         else:
             timer_placeholder.markdown("<div class='timer-text'>🔥 휴식 완료! 다음 세트 준비!</div>", unsafe_allow_html=True)
         time.sleep(1)
-    st.session_state.timer_start = False # 타이머 종료 시 플래그 리셋
+    st.session_state.timer_start = False
 
 # --- UI 화면 배치 ---
 
@@ -60,17 +59,17 @@ with st.container(border=True):
         if st.button("+ 60초"):
             st.session_state.timer_seconds = 60
             st.session_state.timer_start = True
-            st.rarun()
+            st.rerun()  # 완벽 수정!
     with col2:
         if st.button("+ 90초"):
             st.session_state.timer_seconds = 90
             st.session_state.timer_start = True
-            st.rarun()
+            st.rerun()  # 완벽 수정!
     with col3:
         if st.button("정지"):
             st.session_state.timer_start = False
             st.session_state.timer_seconds = 0
-            st.rarun()
+            st.rerun()  # 완벽 수정!
 
 st.markdown("---")
 
@@ -79,21 +78,18 @@ st.markdown("### 🏋️‍♂️ Bench Press (벤치프레스)")
 
 # 세트 리스트 출력 및 완료 체크
 for i, s in enumerate(st.session_state.sets):
-    # 완료 여부에 따라 배경 느낌을 다르게 주기 위해 이모지 활용
     status_emoji = "✅ 완료됨" if s["completed"] else "💪 성공"
     
     col_info, col_btn = st.columns([3, 1])
     with col_info:
         st.markdown(f"**{s['set']}세트** ㅤ|ㅤ {s['weight']} kg ㅤ|ㅤ {s['reps']} 회")
     with col_btn:
-        # 각 세트의 성공/완료 버튼
         if st.button(status_emoji, key=f"btn_{i}"):
             st.session_state.sets[i]["completed"] = not st.session_state.sets[i]["completed"]
-            # 성공으로 변경할 때만 자동으로 60초 타이머 트리거
             if st.session_state.sets[i]["completed"]:
                 st.session_state.timer_seconds = 60
                 st.session_state.timer_start = True
-            st.rarun()
+            st.rerun()  # 완벽 수정!
 
 st.markdown("---")
 
@@ -107,4 +103,4 @@ if st.button("➕ 세트 추가", use_container_width=True):
         "completed": False
     }
     st.session_state.sets.append(new_set)
-    st.rarun()
+    st.rerun()  # 완벽 수정!
