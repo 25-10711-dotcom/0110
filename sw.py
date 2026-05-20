@@ -1,25 +1,28 @@
 import streamlit as st
 import time
 
-# 1. 페이지 기본 설정 및 모바일 스타일 입히기
+# 1. 페이지 기본 설정
 st.set_page_config(page_title="나의 오운완 기록지", layout="centered")
 
-# Streamlit 내부에 CSS 디자인을 안전하게 주입하는 방법
+# 디자인을 위한 CSS 주입 (옵션명을 unsafe_allow_html=True 로 정확히 수정했습니다)
 st.markdown("""
     <style>
     /* 전체 배경과 카드 스타일 */
     .stApp { background-color: #0f172a; color: #f8fafc; }
-    div[data-testid="stCard"] {
-        background-color: #1e293b;
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
+    
     /* 타이머 글씨 강조 */
-    .timer-text { font-size: 32px; font-weight: bold; color: #38bdf8; text-align: center; margin: 10px 0; }
+    .timer-text { 
+        font-size: 28px; 
+        font-weight: bold; 
+        color: #38bdf8; 
+        text-align: center; 
+        margin: 10px 0;
+        padding: 15px;
+        background-color: #1e293b;
+        border-radius: 12px;
+    }
     </style>
-""", unsafe_allow_index=True)
+""", unsafe_allow_html=True)
 
 st.title("🏋️‍♂️ 나의 오운완 기록지")
 
@@ -40,9 +43,11 @@ if st.session_state.timer_start and st.session_state.timer_seconds > 0:
     timer_placeholder = st.empty()
     # 대기 시간을 실시간으로 줄여가며 표시
     for idx in range(st.session_state.timer_seconds, -1, -1):
-        timer_placeholder.markdown(f"<div class='timer-text'>⏱ 휴식 중... {idx}초 남음</div>", unsafe_allow_index=True)
+        if idx > 0:
+            timer_placeholder.markdown(f"<div class='timer-text'>⏱ 휴식 중... {idx}초 남음</div>", unsafe_allow_html=True)
+        else:
+            timer_placeholder.markdown("<div class='timer-text'>🔥 휴식 완료! 다음 세트 준비!</div>", unsafe_allow_html=True)
         time.sleep(1)
-    timer_placeholder.markdown("<div class='timer-text'>🔥 휴식 완료! 다음 세트 준비!</div>", unsafe_allow_index=True)
     st.session_state.timer_start = False # 타이머 종료 시 플래그 리셋
 
 # --- UI 화면 배치 ---
@@ -55,20 +60,22 @@ with st.container(border=True):
         if st.button("+ 60초"):
             st.session_state.timer_seconds = 60
             st.session_state.timer_start = True
-            st.rerun()
+            st.rarun()
     with col2:
         if st.button("+ 90초"):
             st.session_state.timer_seconds = 90
             st.session_state.timer_start = True
-            st.rerun()
+            st.rarun()
     with col3:
         if st.button("정지"):
             st.session_state.timer_start = False
             st.session_state.timer_seconds = 0
-            st.rerun()
+            st.rarun()
+
+st.markdown("---")
 
 # [화면] 2. 운동 일지 섹션
-st.markdown("###  Bench Press (벤치프레스)")
+st.markdown("### 🏋️‍♂️ Bench Press (벤치프레스)")
 
 # 세트 리스트 출력 및 완료 체크
 for i, s in enumerate(st.session_state.sets):
@@ -86,7 +93,7 @@ for i, s in enumerate(st.session_state.sets):
             if st.session_state.sets[i]["completed"]:
                 st.session_state.timer_seconds = 60
                 st.session_state.timer_start = True
-            st.rerun()
+            st.rarun()
 
 st.markdown("---")
 
@@ -100,4 +107,4 @@ if st.button("➕ 세트 추가", use_container_width=True):
         "completed": False
     }
     st.session_state.sets.append(new_set)
-    st.rerun()
+    st.rarun()
